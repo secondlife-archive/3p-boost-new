@@ -428,7 +428,7 @@ esac
 
 sep "includes and text"
 mkdir -p "${stage}"/include
-cp -a boost "${stage}"/include/
+cp -aLr boost "${stage}"/include/
 mkdir -p "${stage}"/LICENSES
 cp -a LICENSE_1_0.txt "${stage}"/LICENSES/boost.txt
 mkdir -p "${stage}"/docs/boost/
