@@ -314,7 +314,8 @@ case "$AUTOBUILD_PLATFORM" in
            /Fo"$(native "$stage/version.obj")" \
            /Fe"$(native "$stage/version.exe")" \
            "$(native "$top/version.c")"
-        "$stage/version.exe" >  "$stage/version.txt"
+        # Boost's VERSION_MACRO emits (e.g.) "1_55"
+        "$stage/version.exe" | tr '_' '.' > "$stage/version.txt"
         rm "$stage"/version.{obj,exe}
         ;;
 
@@ -363,7 +364,8 @@ case "$AUTOBUILD_PLATFORM" in
         cc -DVERSION_HEADER_FILE="\"$VERSION_HEADER_FILE\"" \
            -DVERSION_MACRO="$VERSION_MACRO" \
            -o "$stage/version" "$top/version.c"
-        "$stage/version" > "$stage/version.txt"
+        # Boost's VERSION_MACRO emits (e.g.) "1_55"
+        "$stage/version" | tr '_' '.' > "$stage/version.txt"
         rm "$stage/version"
         ;;
 
@@ -399,7 +401,8 @@ case "$AUTOBUILD_PLATFORM" in
         cc -DVERSION_HEADER_FILE="\"$VERSION_HEADER_FILE\"" \
            -DVERSION_MACRO="$VERSION_MACRO" \
            -o "$stage/version" "$top/version.c"
-        "$stage/version" > "$stage/version.txt"
+        # Boost's VERSION_MACRO emits (e.g.) "1_55"
+        "$stage/version" | tr '_' '.' > "$stage/version.txt"
         rm "$stage/version"
         ;;
 esac
