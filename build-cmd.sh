@@ -3,12 +3,7 @@
 cd "$(dirname "$0")"
 top="$(pwd)"
 
-# turn on verbose debugging output for parabuild logs.
-exec 4>&1; export BASH_XTRACEFD=4; set -x
-# make errors fatal
-set -e
-# error on undefined environment variables
-set -u
+set -eux
 
 BOOST_SOURCE_DIR="boost"
 VERSION_HEADER_FILE="$BOOST_SOURCE_DIR/boost/version.hpp"
@@ -33,11 +28,7 @@ BOOST_LIBS=(context date_time fiber filesystem iostreams json program_options
 # -d0 is quiet, "-d2 -d+4" allows compilation to be examined
 BOOST_BUILD_SPAM="-d0"
 
-top="$(pwd)"
 cd "$BOOST_SOURCE_DIR"
-# As of sometime between Boost 1.67 and 1.72, the Boost build engine b2's
-# legacy bjam alias is no longer copied to the top-level Boost directory. Use
-# b2 directly.
 bjam="$(pwd)/b2"
 stage="$(pwd)/stage"
 
@@ -340,20 +331,12 @@ case "$AUTOBUILD_PLATFORM" in
         stage_lib="${stage}"/lib
         ./bootstrap.sh --prefix=$(pwd) --with-icu="${stage}"/packages
 
-        # Boost.Context and Boost.Coroutine2 now require C++14 support.
-        # Without the -Wno-etc switches, clang spams the build output with
-        # many hundreds of pointless warnings.
-        # Building Boost.Regex without --disable-icu causes the viewer link to
-        # fail for lack of an ICU library.
         DARWIN_BJAM_OPTIONS=("${BOOST_BJAM_OPTIONS[@]}"
             "include=${stage}/packages/include"
             "include=${stage}/packages/include/zlib-ng/"
             "-sZLIB_INCLUDE=${stage}/packages/include/zlib-ng/"
-            cxxflags=-std=c++14
-            cxxflags=-Wno-c99-extensions cxxflags=-Wno-variadic-macros
-            cxxflags=-Wno-unused-function cxxflags=-Wno-unused-const-variable
-            cxxflags=-Wno-unused-local-typedef
-            --disable-icu)
+            "--disable-icu"
+            cxxflags=-std=c++17)
 
         RELEASE_BJAM_OPTIONS=("${DARWIN_BJAM_OPTIONS[@]}"
             "-sZLIB_LIBPATH=${stage}/packages/lib/release")
@@ -361,31 +344,11 @@ case "$AUTOBUILD_PLATFORM" in
         sep "build"
         "${bjam}" toolset=darwin variant=release "${RELEASE_BJAM_OPTIONS[@]}" $BOOST_BUILD_SPAM stage
 
-        # conditionally run unit tests
-        # date_time Posix test failures: https://svn.boost.org/trac/boost/ticket/10570
-        # With Boost 1.64, skip filesystem/tests/issues -- we get:
-        # error: Unable to find file or target named
-        # error:     '6638-convert_aux-fails-init-global.cpp'
-        # error: referred to from project at
-        # error:     'libs/filesystem/test/issues'
-        # regex/tests/de_fuzz depends on an external Fuzzer library:
-        # ld: library not found for -lFuzzer
-        # Sadly, as of Boost 1.65.1, the Stacktrace self-tests just do not
-        # seem ready for prime time on Mac.
-        # Bump the timeout for Boost.Thread tests because our TeamCity Mac
-        # build hosts are getting a bit long in the tooth.
+        # run unit tests
         find_test_dirs "${BOOST_LIBS[@]}" | \
-        tfilter \
-            'date_time/' \
-            'filesystem/test/issues' \
-            'regex/test/de_fuzz' \
-            'stacktrace/' \
-            | \
         run_tests toolset=darwin variant=release -a -q \
                   "${RELEASE_BJAM_OPTIONS[@]}" $BOOST_BUILD_SPAM \
-                  cxxflags="-DBOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED" \
-                  cxxflags="-DBOOST_TIMER_ENABLE_DEPRECATED" \
-                  cxxflags="-DBOOST_THREAD_TEST_TIME_MS=250"
+                  cxxflags="-DBOOST_TIMER_ENABLE_DEPRECATED"
 
         mv "${stage_lib}"/*.a "${stage_release}"
 
@@ -414,7 +377,7 @@ case "$AUTOBUILD_PLATFORM" in
             "-sZLIB_LIBPATH=$stage/packages/lib/release"
             "-sZLIB_INCLUDE=${stage}\/packages/include/zlib/"
             "${BOOST_BJAM_OPTIONS[@]}"
-            cxxflags=-std=c++11)
+            cxxflags=-std=c++17)
         sep "build"
         "${bjam}" variant=release --reconfigure \
             --prefix="${stage}" --libdir="${stage}"/lib/release \
