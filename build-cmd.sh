@@ -14,6 +14,14 @@ BOOST_SOURCE_DIR="boost"
 VERSION_HEADER_FILE="$BOOST_SOURCE_DIR/boost/version.hpp"
 VERSION_MACRO="BOOST_LIB_VERSION"
 
+# Check if nproc is available, otherwise use sysctl -n hw.physicalcpu (macOS)
+if command -v nproc >/dev/null 2>&1; then
+    NPROC=$(nproc)
+else
+    NPROC=$(sysctl -n hw.physicalcpu)
+fi
+
+
 if [ -z "$AUTOBUILD" ] ; then 
     exit 1
 fi
@@ -64,7 +72,7 @@ source_environment_tempfile="$stage/source_environment.sh"
 
 # Explicitly request each of the libraries named in BOOST_LIBS.
 # Use magic bash syntax to prefix each entry in BOOST_LIBS with "--with-".
-BOOST_BJAM_OPTIONS="address-model=$AUTOBUILD_ADDRSIZE architecture=x86 --layout=tagged -sNO_BZIP2=1 -sNO_LZMA=1 -sNO_ZSTD=1 -j$(nproc)\
+BOOST_BJAM_OPTIONS="address-model=$AUTOBUILD_ADDRSIZE architecture=x86 --layout=tagged -sNO_BZIP2=1 -sNO_LZMA=1 -sNO_ZSTD=1 -j$NPROC\
                     ${BOOST_LIBS[*]/#/--with-}"
 
 
