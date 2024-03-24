@@ -121,7 +121,6 @@
           <array>
             <string>LICENSES/boost.txt</string>
             <string>include/boost/*</string>
-            <string>docs/boost/README.Linden</string>
           </array>
           <key>name</key>
           <string>common</string>
