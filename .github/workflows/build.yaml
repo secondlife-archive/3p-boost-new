@@ -11,6 +11,10 @@ jobs:
         os: [windows-large, macos-13-large, ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     steps:
+      # Install newer bash for macOS, globstar support
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: brew install bash
       - uses: secondlife/action-autobuild@v3
   release:
     needs: build
