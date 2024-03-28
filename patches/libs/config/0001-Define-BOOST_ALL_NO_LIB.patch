@@ -1,0 +1,27 @@
+From ab8185bdedd5d03f03373b6657f1536ed9984785 Mon Sep 17 00:00:00 2001
+From: Bennett Goble <signal@lindenlab.com>
+Date: Thu, 28 Mar 2024 09:04:26 -0700
+Subject: [PATCH] Define BOOST_ALL_NO_LIB
+
+Tell the config system not to automatically select which libraries to
+link against.
+---
+ include/boost/config/user.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/boost/config/user.hpp b/include/boost/config/user.hpp
+index 8160fcae..b2d1e399 100644
+--- a/include/boost/config/user.hpp
++++ b/include/boost/config/user.hpp
+@@ -107,7 +107,7 @@
+ // build variant will be automatically selected and linked against, 
+ // simply by the act of including one of that library's headers.  
+ // This macro turns that feature off.
+-// #define BOOST_ALL_NO_LIB
++#define BOOST_ALL_NO_LIB
+  
+ // BOOST_WHATEVER_NO_LIB: Tells the config system not to automatically 
+ // select which library to link against for library "whatever", 
+-- 
+2.34.1
+

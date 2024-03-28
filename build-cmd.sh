@@ -4,6 +4,7 @@ cd "$(dirname "$0")"
 top="$(pwd)"
 
 set -eux
+shopt -s nullglob extglob globstar 
 
 BOOST_SOURCE_DIR="boost"
 VERSION_HEADER_FILE="$BOOST_SOURCE_DIR/boost/version.hpp"
@@ -39,6 +40,26 @@ fail()
 }
 
 [ -f "$stage"/packages/include/zlib-ng/zlib.h ] || fail "You haven't installed the zlib package yet."
+
+if [ ! -d "libs/accumulators/include" ]; then
+    echo "Submodules not present. Initializing..."
+    git submodule update --init --recursive
+fi
+
+# Apply patches
+for patch_file in $top/patches/**/*.patch; do
+    patch=$(basename "$patch_file" .patch)
+    path=$(dirname "$patch_file")
+    path=${path##$top/patches/}
+    pushd "$path"
+    if git apply --check "$patch_file"; then
+        echo "Applying patch $patch"
+        git apply "$patch_file"
+    else
+        echo "Patch $patch already applied"
+    fi
+    popd
+done
 
 if [ "$OSTYPE" = "cygwin" ] ; then
     autobuild="$(cygpath -u $AUTOBUILD)"
