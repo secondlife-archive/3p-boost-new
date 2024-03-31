@@ -23,7 +23,7 @@ fi
 
 # Libraries on which we depend - please keep alphabetized for maintenance
 BOOST_LIBS=(context date_time fiber filesystem iostreams json program_options
-            regex stacktrace system thread)
+            regex stacktrace system thread wave)
 
 # -d0 is quiet, "-d2 -d+4" allows compilation to be examined
 BOOST_BUILD_SPAM="-d0"
@@ -54,6 +54,8 @@ apply_patch()
 }
 
 apply_patch "../patches/libs/config/0001-Define-BOOST_ALL_NO_LIB.patch" "libs/config"
+apply_patch "../patches/libs/config/0002-Extract-BOOST_CODECVT_DO_LENGTH_CONST.patch" "libs/config"
+apply_patch "../patches/libs/fiber/0001-DRTVWR-476-Use-WIN32_LEAN_AND_MEAN-for-each-include-.patch" "libs/fiber"
 
 if [ "$OSTYPE" = "cygwin" ] ; then
     autobuild="$(cygpath -u $AUTOBUILD)"
