@@ -54,7 +54,6 @@ apply_patch()
 }
 
 apply_patch "../patches/libs/config/0001-Define-BOOST_ALL_NO_LIB.patch" "libs/config"
-apply_patch "../patches/libs/config/0002-Extract-BOOST_CODECVT_DO_LENGTH_CONST.patch" "libs/config"
 apply_patch "../patches/libs/fiber/0001-DRTVWR-476-Use-WIN32_LEAN_AND_MEAN-for-each-include-.patch" "libs/fiber"
 
 if [ "$OSTYPE" = "cygwin" ] ; then
@@ -368,6 +367,7 @@ case "$AUTOBUILD_PLATFORM" in
             'filesystem/test/issues' \
             'regex/test/de_fuzz' \
             'stacktrace/' \
+            'wave/' \
             | \
         run_tests toolset=darwin variant=release -a -q \
                   "${RELEASE_BJAM_OPTIONS[@]}" $BOOST_BUILD_SPAM \

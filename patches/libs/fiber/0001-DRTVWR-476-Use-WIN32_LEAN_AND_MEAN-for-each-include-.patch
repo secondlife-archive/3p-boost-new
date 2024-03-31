@@ -1,6 +1,6 @@
 From e4a8aad1795d06bda50e6645596042d0aa9ff0c1 Mon Sep 17 00:00:00 2001
 From: Nat Goodspeed <nat@lindenlab.com>
-Date: Sat, 30 Mar 2024 22:27:00 -0700
+Date: Mon Dec 16 10:27:36 2019 -0500
 Subject: [PATCH] DRTVWR-476: Use WIN32_LEAN_AND_MEAN for each #include
  <windows.h>.
 
